@@ -1,4 +1,5 @@
-var methodOverride = require("method-override"),
+var expressSanitizer = require("express-sanitizer"),
+    methodOverride = require("method-override"),
     bodyParser = require("body-parser"),
     mongoose = require("mongoose"),
     express = require("express"),
@@ -16,7 +17,9 @@ mongoose.set('useFindAndModify', false);
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(expressSanitizer());
 app.use(methodOverride("_method"));
+
 
 var blogSchema = new mongoose.Schema({
     title: String,
@@ -64,6 +67,8 @@ app.get("/blogs/new", function(req, res){
 
 // CREATE ROUTE
 app.post("/blogs", function(req, res){
+    //Sanitize the body
+    req.body.blog.body - req.sanitize(req.body.blog.body)
     // crete blog
     Blog.create(req.body.blog, function(err, newBlog){
         if(err) {
@@ -98,6 +103,8 @@ app.get("/blogs/:id/edit", function(req, res){
 
 // UPDATE ROUTE
 app.put("/blogs/:id", function(req, res){
+    //Sanitize the body
+    req.body.blog.body - req.sanitize(req.body.blog.body)
     Blog.findByIdAndUpdate(req.params.id, req.body.blog, function(err, updatedBlog){
         if (err) {
             res.redirect("/blogs");
